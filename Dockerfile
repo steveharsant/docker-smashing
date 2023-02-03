@@ -1,18 +1,24 @@
 FROM ruby:2.6
-RUN mkdir /smashing
 
 RUN apt-get update && \
     apt-get upgrade -yq && \
-    apt-get install -yq nodejs
+    apt-get install nodejs -y && \
+    mkdir /smashing
 
-COPY Gemfile /smashing/Gemfile
+COPY entrypoint.sh /usr/bin/
 WORKDIR /smashing
 
-RUN bundle install --jobs 80
-COPY entrypoint.sh /usr/bin/
-RUN chmod +x /usr/bin/entrypoint.sh
+RUN gem install bundler && \
+    gem install smashing && \
+    smashing new dashboard && \
+    cd dashboard && \
+    bundle && \
+    \
+    apt autoclean && \
+    apt clean && \
+    apt autoremove --purge && \
+    rm -rf /tmp/* && \
+    chmod +x /usr/bin/entrypoint.sh
 
-ENTRYPOINT ["entrypoint.sh"]
 EXPOSE 3030
-
-CMD ["smashing", "start", "-p", "3030"]
+ENTRYPOINT ["entrypoint.sh"]

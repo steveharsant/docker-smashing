@@ -1,3 +1,5 @@
 #!/bin/bash
+
 set -e
-exec "$@"
+cd /smashing/dashboard
+smashing start -p 3030
